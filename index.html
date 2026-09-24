@@ -152,6 +152,7 @@
   .box-tip { font-size: 12px; color: var(--ink-dim); text-align: center; }
 
   /* Library view */
+  #viewLibrary { background: var(--bg); }
   .lib-header {
     padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 12px;
     border-bottom: 1px solid var(--panel-line); background: var(--panel);
@@ -216,10 +217,12 @@
 <body>
 
 <div class="stage mono">
+  <!-- Shared camera layer — visible behind both Detect and Capture views -->
+  <video id="cam" playsinline muted autoplay></video>
+  <canvas id="overlay" class="overlay"></canvas>
+
   <!-- DETECT VIEW -->
   <div class="view active" id="viewDetect">
-    <video id="cam" playsinline muted autoplay></video>
-    <canvas id="overlay" class="overlay"></canvas>
     <div class="readout" id="readout">
       <div class="readout-count" id="countText">scanning —</div>
       <div class="chips" id="chips"></div>
