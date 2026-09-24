@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Field Scan</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#101208">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #101208;
+    --panel: #1a1d12;
+    --panel-line: #2c301f;
+    --ink: #eae7dc;
+    --ink-dim: #8d9077;
+    --accent: #ff7a1a;
+    --accent-dim: #6b3a13;
+    --box: #6ee06e;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: inherit; }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  html, body {
+    height: 100%;
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    overflow: hidden;
+  }
+
+  .stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  video, canvas.overlay {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+  }
+  video { transform: scaleX(1); background: #000; }
+
+  .scrim-top {
+    position: absolute;
+    top: env(safe-area-inset-top, 0px);
+    left: 0; right: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 18px 20px 26px;
+    background: linear-gradient(to bottom, rgba(16,18,8,0.9), rgba(16,18,8,0));
+    pointer-events: none;
+  }
+
+  .brand {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    color: var(--ink);
+  }
+  .brand span { color: var(--accent); }
+
+  .status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-dim);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--ink-dim);
+    transition: background 0.3s;
+  }
+  .dot.live { background: var(--box); box-shadow: 0 0 6px var(--box); }
+
+  .center-msg {
+    position: absolute;
+    inset: 0;
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    text-align: center;
+    padding: 32px;
+    background: var(--bg);
+  }
+  .center-msg h1 {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--ink);
+    margin: 0;
+    letter-spacing: 0.01em;
+  }
+  .center-msg p {
+    font-size: 14px;
+    color: var(--ink-dim);
+    max-width: 320px;
+    line-height: 1.55;
+    margin: 0;
+  }
+  .btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--bg);
+    background: var(--accent);
+    border: none;
+    padding: 13px 26px;
+    border-radius: 3px;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+  .readout {
+    position: absolute;
+    left: 0; right: 0;
+    bottom: env(safe-area-inset-bottom, 0px);
+    z-index: 5;
+    padding: 18px 18px calc(20px + env(safe-area-inset-bottom, 0px));
+    background: linear-gradient(to top, rgba(16,18,8,0.94), rgba(16,18,8,0));
+    pointer-events: none;
+  }
+  .readout-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-dim);
+    margin-bottom: 8px;
+  }
+  .readout-count b { color: var(--box); font-weight: 500; }
+
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    max-height: 84px;
+    overflow: hidden;
+  }
+  .chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink);
+    background: rgba(46, 50, 30, 0.85);
+    border: 1px solid var(--panel-line);
+    padding: 5px 10px;
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+  .chip em { color: var(--accent); font-style: normal; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dot { transition: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <video id="cam" playsinline muted autoplay></video>
+  <canvas id="overlay" class="overlay"></canvas>
+
+  <div class="scrim-top" id="topBar" style="display:none;">
+    <div class="brand">field<span>scan</span></div>
+    <div class="status"><span class="dot" id="liveDot"></span><span id="statusText">loading model</span></div>
+  </div>
+
+  <div class="readout" id="readout" style="display:none;">
+    <div class="readout-count" id="countText">scanning —</div>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div class="center-msg" id="startScreen">
+    <h1>field scan — object detection test</h1>
+    <p>Points the camera at anything nearby and draws a box around what it recognizes. Runs entirely on your device — nothing is uploaded.</p>
+    <button class="btn" id="startBtn">start camera</button>
+    <p id="errMsg" style="color:#e0765f; display:none;"></p>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
+<script>
+(function () {
+  const startScreen = document.getElementById('startScreen');
+  const startBtn = document.getElementById('startBtn');
+  const errMsg = document.getElementById('errMsg');
+  const topBar = document.getElementById('topBar');
+  const statusText = document.getElementById('statusText');
+  const liveDot = document.getElementById('liveDot');
+  const readout = document.getElementById('readout');
+  const countText = document.getElementById('countText');
+  const chipsEl = document.getElementById('chips');
+
+  const video = document.getElementById('cam');
+  const canvas = document.getElementById('overlay');
+  const ctx = canvas.getContext('2d');
+
+  let model = null;
+  let running = false;
+
+  function showError(msg) {
+    errMsg.textContent = msg;
+    errMsg.style.display = 'block';
+    startBtn.textContent = 'try again';
+  }
+
+  function resizeCanvas() {
+    canvas.width = canvas.clientWidth;
+    canvas.height = canvas.clientHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+
+  async function start() {
+    startBtn.disabled = true;
+    startBtn.textContent = 'starting…';
+    errMsg.style.display = 'none';
+
+    let stream;
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'environment' }, width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false
+      });
+    } catch (e) {
+      startBtn.disabled = false;
+      showError('Camera access was blocked or unavailable. Check your browser\'s camera permission for this page and try again.');
+      return;
+    }
+
+    video.srcObject = stream;
+    await new Promise((res) => { video.onloadedmetadata = () => res(); });
+    await video.play();
+
+    startScreen.style.display = 'none';
+    topBar.style.display = 'flex';
+    readout.style.display = 'block';
+    resizeCanvas();
+
+    try {
+      statusText.textContent = 'loading model';
+      model = await cocoSsd.load({ base: 'lite_mobilenet_v2' });
+    } catch (e) {
+      statusText.textContent = 'model failed to load';
+      countText.textContent = 'Could not load the detection model. Check your connection and reload.';
+      return;
+    }
+
+    running = true;
+    liveDot.classList.add('live');
+    statusText.textContent = 'live';
+    detectLoop();
+  }
+
+  async function detectLoop() {
+    if (!running) return;
+    try {
+      const predictions = await model.detect(video);
+      draw(predictions);
+    } catch (e) {
+      // skip a bad frame silently
+    }
+    requestAnimationFrame(detectLoop);
+  }
+
+  function draw(predictions) {
+    resizeCanvasIfNeeded();
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const scaleX = canvas.width / video.videoWidth;
+    const scaleY = canvas.height / video.videoHeight;
+
+    const good = predictions.filter(p => p.score >= 0.5);
+
+    good.forEach(p => {
+      const [x, y, w, h] = p.bbox;
+      const bx = x * scaleX, by = y * scaleY, bw = w * scaleX, bh = h * scaleY;
+
+      ctx.strokeStyle = '#6ee06e';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(bx, by, bw, bh);
+
+      const label = `${p.class} ${Math.round(p.score * 100)}%`;
+      ctx.font = "500 12px 'JetBrains Mono', monospace";
+      const padX = 6, padY = 4;
+      const textW = ctx.measureText(label).width;
+      const boxH = 18;
+
+      ctx.fillStyle = '#6ee06e';
+      ctx.fillRect(bx, Math.max(0, by - boxH), textW + padX * 2, boxH);
+      ctx.fillStyle = '#101208';
+      ctx.fillText(label, bx + padX, Math.max(0, by - boxH) + boxH - padY);
+    });
+
+    countText.innerHTML = good.length
+      ? `detecting — <b>${good.length}</b> object${good.length === 1 ? '' : 's'}`
+      : 'detecting — nothing recognized yet';
+
+    const counts = {};
+    good.forEach(p => { counts[p.class] = (counts[p.class] || 0) + 1; });
+    chipsEl.innerHTML = Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, n]) => `<span class="chip">${name}${n > 1 ? ` <em>×${n}</em>` : ''}</span>`)
+      .join('');
+  }
+
+  let lastW = 0, lastH = 0;
+  function resizeCanvasIfNeeded() {
+    if (canvas.clientWidth !== lastW || canvas.clientHeight !== lastH) {
+      resizeCanvas();
+      lastW = canvas.clientWidth;
+      lastH = canvas.clientHeight;
+    }
+  }
+
+  startBtn.addEventListener('click', start);
+
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+  }
+})();
+</script>
+</body>
+</html>
