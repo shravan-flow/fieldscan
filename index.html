@@ -28,71 +28,47 @@
   * { box-sizing: inherit; }
   html { scroll-padding-top: env(safe-area-inset-top, 0px); }
   html, body {
-    height: 100%;
-    margin: 0;
-    background: var(--bg);
-    color: var(--ink);
-    font-family: 'Inter', system-ui, sans-serif;
-    overflow: hidden;
+    height: 100%; margin: 0; background: var(--bg); color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif; overflow: hidden;
   }
+  .mono { font-family: 'JetBrains Mono', monospace; }
 
   .stage { position: relative; width: 100%; height: 100%; }
+  .view { position: absolute; inset: 0; display: none; }
+  .view.active { display: block; }
 
   video, canvas.overlay {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    object-fit: cover;
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;
   }
   video { background: #000; }
   #shotCanvas { display: none; }
 
   .scrim-top {
-    position: absolute;
-    top: env(safe-area-inset-top, 0px);
-    left: 0; right: 0;
-    z-index: 5;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    position: absolute; top: env(safe-area-inset-top, 0px); left: 0; right: 0; z-index: 5;
+    display: flex; align-items: center; justify-content: space-between;
     padding: 14px 16px 24px;
     background: linear-gradient(to bottom, rgba(16,18,8,0.92), rgba(16,18,8,0));
     pointer-events: none;
   }
   .scrim-top > * { pointer-events: auto; }
-
-  .brand { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--ink); }
+  .brand { font-size: 13px; color: var(--ink); }
   .brand span { color: var(--accent); }
 
-  .modes {
-    display: flex;
-    background: rgba(26,29,18,0.9);
-    border: 1px solid var(--panel-line);
-    border-radius: 20px;
-    padding: 3px;
-    gap: 2px;
+  .tabs {
+    display: flex; background: rgba(26,29,18,0.9); border: 1px solid var(--panel-line);
+    border-radius: 20px; padding: 3px; gap: 2px;
   }
-  .mode-btn {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--ink-dim);
-    background: none;
-    border: none;
-    padding: 7px 13px;
-    border-radius: 16px;
-    cursor: pointer;
+  .tab-btn {
+    font-size: 11px; color: var(--ink-dim); background: none; border: none;
+    padding: 7px 12px; border-radius: 16px; cursor: pointer; white-space: nowrap;
   }
-  .mode-btn.active { background: var(--accent); color: var(--bg); }
+  .tab-btn.active { background: var(--accent); color: var(--bg); }
 
   .gear-btn {
-    width: 34px; height: 34px;
-    border-radius: 50%;
-    background: rgba(26,29,18,0.9);
-    border: 1px solid var(--panel-line);
-    color: var(--ink-dim);
-    font-size: 15px;
-    cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
+    width: 34px; height: 34px; border-radius: 50%;
+    background: rgba(26,29,18,0.9); border: 1px solid var(--panel-line);
+    color: var(--ink-dim); font-size: 15px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
   }
 
   .center-msg {
@@ -100,173 +76,236 @@
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: 18px; text-align: center; padding: 32px; background: var(--bg);
   }
-  .center-msg h1 { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 500; margin: 0; }
-  .center-msg p { font-size: 14px; color: var(--ink-dim); max-width: 320px; line-height: 1.55; margin: 0; }
+  .center-msg h1 { font-size: 15px; font-weight: 500; margin: 0; }
+  .center-msg p { font-size: 14px; color: var(--ink-dim); max-width: 320px; line-height: 1.55; margin: 0; font-family: 'Inter', sans-serif; }
 
   .btn {
-    font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--bg);
-    background: var(--accent); border: none; padding: 13px 26px; border-radius: 3px; cursor: pointer;
+    font-size: 13px; color: var(--bg); background: var(--accent);
+    border: none; padding: 13px 26px; border-radius: 3px; cursor: pointer;
   }
   .btn:active { transform: translateY(1px); }
   .btn.secondary { background: transparent; color: var(--ink); border: 1px solid var(--panel-line); }
+  .btn.danger { background: transparent; color: var(--bad); border: 1px solid var(--bad); }
   .btn:disabled { opacity: 0.5; }
 
+  /* Detect view */
   .readout {
     position: absolute; left: 0; right: 0; bottom: env(safe-area-inset-bottom, 0px); z-index: 5;
     padding: 18px 18px calc(20px + env(safe-area-inset-bottom, 0px));
     background: linear-gradient(to top, rgba(16,18,8,0.94), rgba(16,18,8,0));
     pointer-events: none;
   }
-  .readout-count { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--ink-dim); margin-bottom: 8px; }
+  .readout-count { font-size: 12px; color: var(--ink-dim); margin-bottom: 8px; }
   .readout-count b { color: var(--box); font-weight: 500; }
   .chips { display: flex; flex-wrap: wrap; gap: 7px; max-height: 84px; overflow: hidden; }
   .chip {
-    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink);
-    background: rgba(46,50,30,0.85); border: 1px solid var(--panel-line);
-    padding: 5px 10px; border-radius: 2px; white-space: nowrap;
+    font-size: 11px; color: var(--ink); background: rgba(46,50,30,0.85);
+    border: 1px solid var(--panel-line); padding: 5px 10px; border-radius: 2px; white-space: nowrap;
   }
   .chip em { color: var(--accent); font-style: normal; }
 
-  /* Collect mode */
+  /* Capture view */
   .capture-btn {
-    position: absolute;
-    bottom: calc(30px + env(safe-area-inset-bottom, 0px));
-    left: 50%; transform: translateX(-50%);
-    z-index: 5;
-    width: 68px; height: 68px;
-    border-radius: 50%;
-    background: var(--accent);
-    border: 4px solid rgba(234,231,220,0.85);
-    cursor: pointer;
+    position: absolute; bottom: calc(30px + env(safe-area-inset-bottom, 0px));
+    left: 50%; transform: translateX(-50%); z-index: 5;
+    width: 68px; height: 68px; border-radius: 50%;
+    background: var(--accent); border: 4px solid rgba(234,231,220,0.85); cursor: pointer;
   }
   .capture-btn:active { transform: translateX(-50%) scale(0.94); }
-
-  .session-count {
-    position: absolute;
-    bottom: calc(115px + env(safe-area-inset-bottom, 0px));
-    left: 0; right: 0;
-    z-index: 5;
-    text-align: center;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    color: var(--ink-dim);
-    pointer-events: none;
+  .capture-hint {
+    position: absolute; bottom: calc(115px + env(safe-area-inset-bottom, 0px)); left: 0; right: 0; z-index: 5;
+    text-align: center; font-size: 11px; color: var(--ink-dim); pointer-events: none;
   }
-  .session-count b { color: var(--box); }
+  .capture-hint b { color: var(--box); }
 
-  .review-sheet {
-    position: absolute; inset: 0; z-index: 10;
-    background: var(--bg);
+  /* Quick label sheet (after capture) */
+  .sheet {
+    position: absolute; inset: 0; z-index: 10; background: var(--bg);
     display: flex; flex-direction: column;
   }
-  .review-photo { flex: 1; position: relative; background: #000; min-height: 0; }
-  .review-photo img { width: 100%; height: 100%; object-fit: contain; }
+  .sheet-photo { flex: 1; position: relative; background: #000; min-height: 0; touch-action: none; }
+  .sheet-photo img { width: 100%; height: 100%; object-fit: contain; display: block; }
+  .sheet-photo canvas.box-layer { position: absolute; inset: 0; width: 100%; height: 100%; }
 
-  .review-form {
-    padding: 16px 18px calc(18px + env(safe-area-inset-bottom, 0px));
-    background: var(--panel);
-    border-top: 1px solid var(--panel-line);
-    display: flex; flex-direction: column; gap: 12px;
+  .sheet-form {
+    padding: 14px 18px calc(16px + env(safe-area-inset-bottom, 0px));
+    background: var(--panel); border-top: 1px solid var(--panel-line);
+    display: flex; flex-direction: column; gap: 10px;
   }
-  .review-form label { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-dim); }
-  .review-form input[type="text"] {
-    width: 100%;
-    background: var(--bg);
-    border: 1px solid var(--panel-line);
-    color: var(--ink);
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    padding: 12px 14px;
-    border-radius: 4px;
+  .sheet-form label { font-size: 11px; color: var(--ink-dim); }
+  .sheet-form input[type="text"] {
+    width: 100%; background: var(--bg); border: 1px solid var(--panel-line); color: var(--ink);
+    font-family: 'Inter', sans-serif; font-size: 16px; padding: 12px 14px; border-radius: 4px;
   }
-  .review-form input[type="text"]:focus { outline: 2px solid var(--accent); }
+  .sheet-form input[type="text"]:focus { outline: 2px solid var(--accent); }
   .recent-labels { display: flex; flex-wrap: wrap; gap: 6px; }
   .recent-chip {
-    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink);
-    background: rgba(46,50,30,0.85); border: 1px solid var(--panel-line);
-    padding: 6px 10px; border-radius: 14px; cursor: pointer;
+    font-size: 11px; color: var(--ink); background: rgba(46,50,30,0.85);
+    border: 1px solid var(--panel-line); padding: 6px 10px; border-radius: 14px; cursor: pointer;
   }
-  .review-actions { display: flex; gap: 10px; }
-  .review-actions .btn { flex: 1; }
-  .save-status { font-family: 'JetBrains Mono', monospace; font-size: 11px; min-height: 15px; }
-  .save-status.ok { color: var(--box); }
-  .save-status.err { color: var(--bad); }
-  .save-status.pending { color: var(--ink-dim); }
+  .sheet-actions { display: flex; gap: 10px; }
+  .sheet-actions .btn { flex: 1; }
+  .sheet-status { font-size: 11px; min-height: 15px; }
+  .sheet-status.ok { color: var(--box); }
+  .sheet-status.err { color: var(--bad); }
+  .sheet-status.pending { color: var(--ink-dim); }
+  .box-tip { font-size: 12px; color: var(--ink-dim); text-align: center; }
+
+  /* Library view */
+  .lib-header {
+    padding: calc(14px + env(safe-area-inset-top, 0px)) 16px 12px;
+    border-bottom: 1px solid var(--panel-line); background: var(--panel);
+  }
+  .lib-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .lib-stats { font-size: 11px; color: var(--ink-dim); }
+  .lib-stats b { color: var(--ink); }
+  .storage-bar { font-size: 10px; color: var(--ink-dim); margin-top: 6px; }
+  .lib-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .lib-actions .btn { padding: 9px 16px; font-size: 12px; }
+
+  .lib-body { position: absolute; top: 0; left: 0; right: 0; bottom: 0; padding-top: 148px; overflow-y: auto; }
+  .lib-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 12px 16px calc(24px + env(safe-area-inset-bottom, 0px)); }
+  .lib-card {
+    position: relative; aspect-ratio: 1; border-radius: 6px; overflow: hidden;
+    background: var(--panel); border: 1px solid var(--panel-line); cursor: pointer;
+  }
+  .lib-card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .lib-badge {
+    position: absolute; top: 5px; right: 5px; width: 9px; height: 9px; border-radius: 50%;
+    border: 1.5px solid rgba(16,18,8,0.6);
+  }
+  .lib-badge.pending { background: var(--ink-dim); }
+  .lib-badge.boxed { background: var(--box); }
+  .lib-badge.synced { background: #4a90d9; }
+  .lib-label {
+    position: absolute; bottom: 0; left: 0; right: 0; font-size: 10px; color: var(--ink);
+    background: linear-gradient(to top, rgba(16,18,8,0.95), rgba(16,18,8,0));
+    padding: 12px 6px 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .lib-empty { padding: 60px 30px; text-align: center; color: var(--ink-dim); font-size: 13px; line-height: 1.6; }
+
+  .sync-log {
+    position: fixed; left: 16px; right: 16px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 20;
+    background: var(--panel); border: 1px solid var(--panel-line); border-radius: 6px;
+    padding: 12px 14px; font-size: 12px; color: var(--ink-dim);
+  }
+  .sync-log b { color: var(--ink); }
 
   /* Settings sheet */
   .settings-sheet {
-    position: absolute; inset: 0; z-index: 12;
-    background: var(--bg);
+    position: absolute; inset: 0; z-index: 12; background: var(--bg);
     padding: calc(24px + env(safe-area-inset-top, 0px)) 20px calc(24px + env(safe-area-inset-bottom, 0px));
     overflow-y: auto;
   }
-  .settings-sheet h2 { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 500; margin: 0 0 6px; }
-  .settings-sheet p.hint { font-size: 13px; color: var(--ink-dim); line-height: 1.5; margin: 0 0 20px; }
+  .settings-sheet h2 { font-size: 15px; font-weight: 500; margin: 0 0 6px; }
+  .settings-sheet p.hint { font-size: 13px; color: var(--ink-dim); line-height: 1.5; margin: 0 0 20px; font-family: 'Inter', sans-serif; }
   .field { margin-bottom: 16px; }
-  .field label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-dim); margin-bottom: 6px; }
+  .field label { display: block; font-size: 11px; color: var(--ink-dim); margin-bottom: 6px; }
   .field input {
-    width: 100%;
-    background: var(--panel);
-    border: 1px solid var(--panel-line);
-    color: var(--ink);
-    font-family: 'Inter', sans-serif;
-    font-size: 15px;
-    padding: 12px 14px;
-    border-radius: 4px;
+    width: 100%; background: var(--panel); border: 1px solid var(--panel-line); color: var(--ink);
+    font-family: 'Inter', sans-serif; font-size: 15px; padding: 12px 14px; border-radius: 4px;
   }
   .field input:focus { outline: 2px solid var(--accent); }
   .settings-actions { display: flex; gap: 10px; margin-top: 22px; }
   .settings-actions .btn { flex: 1; }
-  .settings-msg { font-family: 'JetBrains Mono', monospace; font-size: 12px; margin-top: 14px; min-height: 16px; }
+  .settings-msg { font-size: 12px; margin-top: 14px; min-height: 16px; }
   .settings-msg.ok { color: var(--box); }
   .settings-msg.err { color: var(--bad); }
-
-  @media (prefers-reduced-motion: reduce) { .capture-btn { transition: none; } }
 </style>
 </head>
 <body>
 
-<div class="stage">
-  <video id="cam" playsinline muted autoplay></video>
-  <canvas id="overlay" class="overlay"></canvas>
+<div class="stage mono">
+  <!-- DETECT VIEW -->
+  <div class="view active" id="viewDetect">
+    <video id="cam" playsinline muted autoplay></video>
+    <canvas id="overlay" class="overlay"></canvas>
+    <div class="readout" id="readout">
+      <div class="readout-count" id="countText">scanning —</div>
+      <div class="chips" id="chips"></div>
+    </div>
+  </div>
+
+  <!-- CAPTURE VIEW -->
+  <div class="view" id="viewCapture">
+    <div class="capture-hint">quick capture — <b id="localCount">0</b> saved on this phone</div>
+    <button class="capture-btn" id="captureBtn" title="Capture frame"></button>
+  </div>
+
+  <!-- LIBRARY VIEW -->
+  <div class="view" id="viewLibrary">
+    <div class="lib-header">
+      <div class="lib-title-row">
+        <div class="lib-stats"><b id="libTotal">0</b> total · <b id="libUnboxed">0</b> unannotated · <b id="libUnsynced">0</b> unsynced</div>
+      </div>
+      <div class="storage-bar" id="storageBar">checking storage…</div>
+      <div class="lib-actions">
+        <button class="btn" id="syncBtn">sync to github</button>
+        <button class="btn secondary" id="clearSyncedBtn">clear synced from phone</button>
+      </div>
+    </div>
+    <div class="lib-body">
+      <div class="lib-grid" id="libGrid"></div>
+      <div class="lib-empty" id="libEmpty" style="display:none;">Nothing captured yet. Switch to the capture tab and take some photos — they'll show up here.</div>
+    </div>
+  </div>
+
+  <!-- shared canvas for taking a still frame -->
   <canvas id="shotCanvas"></canvas>
 
+  <!-- top bar: tabs + settings, shown once camera is running -->
   <div class="scrim-top" id="topBar" style="display:none;">
     <div class="brand">field<span>scan</span></div>
-    <div class="modes">
-      <button class="mode-btn active" id="modeDetect">detect</button>
-      <button class="mode-btn" id="modeCollect">collect</button>
+    <div class="tabs">
+      <button class="tab-btn active" id="tabDetect">detect</button>
+      <button class="tab-btn" id="tabCapture">capture</button>
+      <button class="tab-btn" id="tabLibrary">library</button>
     </div>
     <button class="gear-btn" id="gearBtn" title="GitHub settings">⚙</button>
   </div>
 
-  <div class="readout" id="readout" style="display:none;">
-    <div class="readout-count" id="countText">scanning —</div>
-    <div class="chips" id="chips"></div>
-  </div>
-
-  <div class="session-count" id="sessionCount" style="display:none;">0 <span style="opacity:.6">saved this session</span></div>
-  <button class="capture-btn" id="captureBtn" style="display:none;" title="Capture frame"></button>
-
-  <div class="review-sheet" id="reviewSheet" style="display:none;">
-    <div class="review-photo"><img id="reviewImg" alt="captured frame"></div>
-    <div class="review-form">
+  <!-- Quick label sheet, shown right after a capture -->
+  <div class="sheet" id="labelSheet" style="display:none;">
+    <div class="sheet-photo"><img id="labelImg" alt="captured frame"></div>
+    <div class="sheet-form">
       <div>
         <label for="labelInput">what is this part?</label>
         <input type="text" id="labelInput" placeholder="e.g. mid-drive motor" autocomplete="off">
       </div>
       <div class="recent-labels" id="recentLabels"></div>
-      <div class="review-actions">
+      <div class="sheet-actions">
         <button class="btn secondary" id="retakeBtn">retake</button>
-        <button class="btn" id="saveBtn">save to github</button>
+        <button class="btn" id="saveLocalBtn">save to phone</button>
       </div>
-      <div class="save-status" id="saveStatus"></div>
+      <div class="sheet-status" id="labelStatus"></div>
     </div>
   </div>
 
+  <!-- Annotate sheet, opened from Library -->
+  <div class="sheet" id="annotateSheet" style="display:none;">
+    <div class="sheet-photo" id="annotatePhotoWrap">
+      <img id="annotateImg" alt="captured frame">
+      <canvas class="box-layer" id="boxLayer"></canvas>
+    </div>
+    <div class="sheet-form">
+      <div class="box-tip">drag a box around the part with your finger</div>
+      <div>
+        <label for="annotateLabelInput">label</label>
+        <input type="text" id="annotateLabelInput" placeholder="e.g. cassette" autocomplete="off">
+      </div>
+      <div class="sheet-actions">
+        <button class="btn danger" id="deleteSampleBtn">delete</button>
+        <button class="btn secondary" id="clearBoxBtn">clear box</button>
+        <button class="btn" id="saveAnnotationBtn">save</button>
+      </div>
+      <div class="sheet-status" id="annotateStatus"></div>
+    </div>
+  </div>
+
+  <!-- Settings sheet -->
   <div class="settings-sheet" id="settingsSheet" style="display:none;">
     <h2>github connection</h2>
-    <p class="hint">Data you capture is committed straight to your repo. The token stays only in this browser — it's never written into your code.</p>
+    <p class="hint">Used only when you tap "sync to github" in Library. Photos stay on your phone until then. The token stays only in this browser — never written into your code.</p>
     <div class="field"><label>github username</label><input type="text" id="ghOwner" placeholder="e.g. shravana"></div>
     <div class="field"><label>repository name</label><input type="text" id="ghRepo" placeholder="e.g. fieldscan"></div>
     <div class="field"><label>branch</label><input type="text" id="ghBranch" placeholder="main"></div>
@@ -278,9 +317,11 @@
     <div class="settings-msg" id="settingsMsg"></div>
   </div>
 
+  <div class="sync-log" id="syncLog" style="display:none;"></div>
+
   <div class="center-msg" id="startScreen">
     <h1>field scan</h1>
-    <p>Detect everyday objects live, or switch to Collect mode to gather your own labeled photos for a custom model — saved straight to GitHub.</p>
+    <p>Detect everyday objects live, or capture your own labeled photos, draw boxes at your own pace, and sync to GitHub when ready.</p>
     <button class="btn" id="startBtn">start camera</button>
     <p id="errMsg" style="color:#e0765f; display:none;"></p>
   </div>
@@ -290,6 +331,68 @@
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js"></script>
 <script>
 (function () {
+  // ============================================================
+  // IndexedDB helper
+  // ============================================================
+  const DB_NAME = 'fieldscan_db';
+  const STORE = 'samples';
+  function openDB() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = (e) => {
+        const db = e.target.result;
+        if (!db.objectStoreNames.contains(STORE)) {
+          db.createObjectStore(STORE, { keyPath: 'id' });
+        }
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+  async function dbPut(sample) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readwrite');
+      tx.objectStore(STORE).put(sample);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+  async function dbGetAll() {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readonly');
+      const req = tx.objectStore(STORE).getAll();
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+  async function dbGet(id) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readonly');
+      const req = tx.objectStore(STORE).get(id);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+  async function dbDelete(id) {
+    const db = await openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readwrite');
+      tx.objectStore(STORE).delete(id);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+  function uuid() {
+    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+    return 'id-' + Date.now() + '-' + Math.random().toString(16).slice(2);
+  }
+
+  // ============================================================
+  // Shared elements
+  // ============================================================
   const startScreen = document.getElementById('startScreen');
   const startBtn = document.getElementById('startBtn');
   const errMsg = document.getElementById('errMsg');
@@ -301,22 +404,47 @@
   const ctx = canvas.getContext('2d');
   const shotCanvas = document.getElementById('shotCanvas');
 
-  const modeDetectBtn = document.getElementById('modeDetect');
-  const modeCollectBtn = document.getElementById('modeCollect');
+  const tabDetect = document.getElementById('tabDetect');
+  const tabCapture = document.getElementById('tabCapture');
+  const tabLibrary = document.getElementById('tabLibrary');
+  const viewDetect = document.getElementById('viewDetect');
+  const viewCapture = document.getElementById('viewCapture');
+  const viewLibrary = document.getElementById('viewLibrary');
 
   const readout = document.getElementById('readout');
   const countText = document.getElementById('countText');
   const chipsEl = document.getElementById('chips');
 
   const captureBtn = document.getElementById('captureBtn');
-  const sessionCountEl = document.getElementById('sessionCount');
-  const reviewSheet = document.getElementById('reviewSheet');
-  const reviewImg = document.getElementById('reviewImg');
+  const localCountEl = document.getElementById('localCount');
+
+  const labelSheet = document.getElementById('labelSheet');
+  const labelImg = document.getElementById('labelImg');
   const labelInput = document.getElementById('labelInput');
   const recentLabelsEl = document.getElementById('recentLabels');
   const retakeBtn = document.getElementById('retakeBtn');
-  const saveBtn = document.getElementById('saveBtn');
-  const saveStatus = document.getElementById('saveStatus');
+  const saveLocalBtn = document.getElementById('saveLocalBtn');
+  const labelStatus = document.getElementById('labelStatus');
+
+  const libTotal = document.getElementById('libTotal');
+  const libUnboxed = document.getElementById('libUnboxed');
+  const libUnsynced = document.getElementById('libUnsynced');
+  const storageBar = document.getElementById('storageBar');
+  const syncBtn = document.getElementById('syncBtn');
+  const clearSyncedBtn = document.getElementById('clearSyncedBtn');
+  const libGrid = document.getElementById('libGrid');
+  const libEmpty = document.getElementById('libEmpty');
+  const syncLog = document.getElementById('syncLog');
+
+  const annotateSheet = document.getElementById('annotateSheet');
+  const annotateImg = document.getElementById('annotateImg');
+  const annotatePhotoWrap = document.getElementById('annotatePhotoWrap');
+  const boxLayer = document.getElementById('boxLayer');
+  const annotateLabelInput = document.getElementById('annotateLabelInput');
+  const deleteSampleBtn = document.getElementById('deleteSampleBtn');
+  const clearBoxBtn = document.getElementById('clearBoxBtn');
+  const saveAnnotationBtn = document.getElementById('saveAnnotationBtn');
+  const annotateStatus = document.getElementById('annotateStatus');
 
   const settingsSheet = document.getElementById('settingsSheet');
   const ghOwner = document.getElementById('ghOwner');
@@ -329,8 +457,7 @@
 
   let model = null;
   let running = false;
-  let mode = 'detect';
-  let sessionSaved = 0;
+  let tab = 'detect';
   let pendingBlob = null;
 
   const CFG_KEY = 'fieldscan_gh_cfg_v1';
@@ -338,18 +465,12 @@
   let ghConfig = null;
 
   function loadConfig() {
-    try {
-      const raw = localStorage.getItem(CFG_KEY);
-      ghConfig = raw ? JSON.parse(raw) : null;
-    } catch (e) { ghConfig = null; }
+    try { ghConfig = JSON.parse(localStorage.getItem(CFG_KEY) || 'null'); }
+    catch (e) { ghConfig = null; }
   }
-  function saveConfig(cfg) {
-    ghConfig = cfg;
-    localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
-  }
+  function saveConfig(cfg) { ghConfig = cfg; localStorage.setItem(CFG_KEY, JSON.stringify(cfg)); }
   function loadRecentLabels() {
-    try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); }
-    catch (e) { return []; }
+    try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]'); } catch (e) { return []; }
   }
   function rememberLabel(label) {
     let list = loadRecentLabels();
@@ -358,32 +479,25 @@
     renderRecentLabels();
   }
   function renderRecentLabels() {
-    const list = loadRecentLabels();
-    recentLabelsEl.innerHTML = list.map(l =>
-      `<span class="recent-chip" data-label="${l.replace(/"/g,'&quot;')}">${l}</span>`
-    ).join('');
+    recentLabelsEl.innerHTML = loadRecentLabels().map(l =>
+      `<span class="recent-chip" data-label="${l.replace(/"/g,'&quot;')}">${l}</span>`).join('');
   }
   recentLabelsEl.addEventListener('click', (e) => {
     const chip = e.target.closest('.recent-chip');
     if (chip) labelInput.value = chip.dataset.label;
   });
 
+  // ============================================================
+  // Camera + model bootstrap
+  // ============================================================
   function showError(msg) {
-    errMsg.textContent = msg;
-    errMsg.style.display = 'block';
-    startBtn.textContent = 'try again';
+    errMsg.textContent = msg; errMsg.style.display = 'block'; startBtn.textContent = 'try again';
   }
-  function resizeCanvas() {
-    canvas.width = canvas.clientWidth;
-    canvas.height = canvas.clientHeight;
-  }
+  function resizeCanvas() { canvas.width = canvas.clientWidth; canvas.height = canvas.clientHeight; }
   window.addEventListener('resize', resizeCanvas);
 
   async function start() {
-    startBtn.disabled = true;
-    startBtn.textContent = 'starting…';
-    errMsg.style.display = 'none';
-
+    startBtn.disabled = true; startBtn.textContent = 'starting…'; errMsg.style.display = 'none';
     let stream;
     try {
       stream = await navigator.mediaDevices.getUserMedia({
@@ -395,7 +509,6 @@
       showError('Camera access was blocked or unavailable. Check your browser\'s camera permission for this page and try again.');
       return;
     }
-
     video.srcObject = stream;
     await new Promise((res) => { video.onloadedmetadata = () => res(); });
     await video.play();
@@ -406,112 +519,321 @@
 
     loadConfig();
     renderRecentLabels();
-    setMode('detect');
+    if (navigator.storage && navigator.storage.persist) { navigator.storage.persist().catch(() => {}); }
+    refreshLocalCount();
+    setTab('detect');
 
-    try {
-      model = await cocoSsd.load({ base: 'lite_mobilenet_v2' });
-    } catch (e) {
-      countText.textContent = 'Could not load the detection model. Check your connection and reload.';
-      return;
-    }
+    try { model = await cocoSsd.load({ base: 'lite_mobilenet_v2' }); }
+    catch (e) { countText.textContent = 'Could not load the detection model. Check your connection and reload.'; return; }
 
     running = true;
     detectLoop();
   }
 
-  function setMode(next) {
-    mode = next;
-    modeDetectBtn.classList.toggle('active', mode === 'detect');
-    modeCollectBtn.classList.toggle('active', mode === 'collect');
-    readout.style.display = mode === 'detect' ? 'block' : 'none';
-    captureBtn.style.display = mode === 'collect' ? 'block' : 'none';
-    sessionCountEl.style.display = mode === 'collect' ? 'block' : 'none';
-    if (mode === 'detect') { ctx.clearRect(0,0,canvas.width,canvas.height); }
+  // ============================================================
+  // Tabs
+  // ============================================================
+  function setTab(next) {
+    tab = next;
+    tabDetect.classList.toggle('active', tab === 'detect');
+    tabCapture.classList.toggle('active', tab === 'capture');
+    tabLibrary.classList.toggle('active', tab === 'library');
+    viewDetect.classList.toggle('active', tab === 'detect');
+    viewCapture.classList.toggle('active', tab === 'capture');
+    viewLibrary.classList.toggle('active', tab === 'library');
+    if (tab === 'detect') ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (tab === 'library') refreshLibrary();
   }
-  modeDetectBtn.addEventListener('click', () => setMode('detect'));
-  modeCollectBtn.addEventListener('click', () => {
-    loadConfig();
-    if (!ghConfig || !ghConfig.token) { openSettings(); return; }
-    setMode('collect');
-  });
+  tabDetect.addEventListener('click', () => setTab('detect'));
+  tabCapture.addEventListener('click', () => { refreshLocalCount(); setTab('capture'); });
+  tabLibrary.addEventListener('click', () => setTab('library'));
 
+  async function refreshLocalCount() {
+    const all = await dbGetAll();
+    localCountEl.textContent = all.length;
+  }
+
+  // ============================================================
+  // Detect mode
+  // ============================================================
   async function detectLoop() {
     if (!running) return;
-    if (mode === 'detect' && model) {
-      try {
-        const predictions = await model.detect(video);
-        draw(predictions);
-      } catch (e) {}
+    if (tab === 'detect' && model) {
+      try { draw(await model.detect(video)); } catch (e) {}
     }
     requestAnimationFrame(detectLoop);
   }
-
   function draw(predictions) {
     resizeCanvasIfNeeded();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const scaleX = canvas.width / video.videoWidth;
-    const scaleY = canvas.height / video.videoHeight;
+    const scaleX = canvas.width / video.videoWidth, scaleY = canvas.height / video.videoHeight;
     const good = predictions.filter(p => p.score >= 0.5);
-
     good.forEach(p => {
       const [x, y, w, h] = p.bbox;
       const bx = x * scaleX, by = y * scaleY, bw = w * scaleX, bh = h * scaleY;
-      ctx.strokeStyle = '#6ee06e';
-      ctx.lineWidth = 2;
-      ctx.strokeRect(bx, by, bw, bh);
+      ctx.strokeStyle = '#6ee06e'; ctx.lineWidth = 2; ctx.strokeRect(bx, by, bw, bh);
       const label = `${p.class} ${Math.round(p.score * 100)}%`;
       ctx.font = "500 12px 'JetBrains Mono', monospace";
-      const padX = 6, padY = 4;
-      const textW = ctx.measureText(label).width;
-      const boxH = 18;
-      ctx.fillStyle = '#6ee06e';
-      ctx.fillRect(bx, Math.max(0, by - boxH), textW + padX * 2, boxH);
-      ctx.fillStyle = '#101208';
-      ctx.fillText(label, bx + padX, Math.max(0, by - boxH) + boxH - padY);
+      const padX = 6, padY = 4, textW = ctx.measureText(label).width, boxH = 18;
+      ctx.fillStyle = '#6ee06e'; ctx.fillRect(bx, Math.max(0, by - boxH), textW + padX * 2, boxH);
+      ctx.fillStyle = '#101208'; ctx.fillText(label, bx + padX, Math.max(0, by - boxH) + boxH - padY);
     });
-
-    countText.innerHTML = good.length
-      ? `detecting — <b>${good.length}</b> object${good.length === 1 ? '' : 's'}`
-      : 'detecting — nothing recognized yet';
+    countText.innerHTML = good.length ? `detecting — <b>${good.length}</b> object${good.length === 1 ? '' : 's'}` : 'detecting — nothing recognized yet';
     const counts = {};
     good.forEach(p => { counts[p.class] = (counts[p.class] || 0) + 1; });
-    chipsEl.innerHTML = Object.entries(counts)
-      .sort((a, b) => b[1] - a[1])
-      .map(([name, n]) => `<span class="chip">${name}${n > 1 ? ` <em>×${n}</em>` : ''}</span>`)
-      .join('');
+    chipsEl.innerHTML = Object.entries(counts).sort((a, b) => b[1] - a[1])
+      .map(([name, n]) => `<span class="chip">${name}${n > 1 ? ` <em>×${n}</em>` : ''}</span>`).join('');
   }
   let lastW = 0, lastH = 0;
   function resizeCanvasIfNeeded() {
-    if (canvas.clientWidth !== lastW || canvas.clientHeight !== lastH) {
-      resizeCanvas(); lastW = canvas.clientWidth; lastH = canvas.clientHeight;
-    }
+    if (canvas.clientWidth !== lastW || canvas.clientHeight !== lastH) { resizeCanvas(); lastW = canvas.clientWidth; lastH = canvas.clientHeight; }
   }
 
+  // ============================================================
+  // Capture mode -> quick label -> save locally
+  // ============================================================
   captureBtn.addEventListener('click', () => {
     const maxDim = 1024;
-    let w = video.videoWidth, h = video.videoHeight;
+    const w = video.videoWidth, h = video.videoHeight;
     const scale = Math.min(1, maxDim / Math.max(w, h));
     shotCanvas.width = Math.round(w * scale);
     shotCanvas.height = Math.round(h * scale);
-    const sctx = shotCanvas.getContext('2d');
-    sctx.drawImage(video, 0, 0, shotCanvas.width, shotCanvas.height);
-
+    shotCanvas.getContext('2d').drawImage(video, 0, 0, shotCanvas.width, shotCanvas.height);
     shotCanvas.toBlob((blob) => {
       pendingBlob = blob;
-      reviewImg.src = URL.createObjectURL(blob);
+      labelImg.src = URL.createObjectURL(blob);
       labelInput.value = '';
-      saveStatus.textContent = '';
-      saveStatus.className = 'save-status';
-      reviewSheet.style.display = 'flex';
+      labelStatus.textContent = ''; labelStatus.className = 'sheet-status';
+      labelSheet.style.display = 'flex';
       setTimeout(() => labelInput.focus(), 50);
     }, 'image/jpeg', 0.85);
   });
+  retakeBtn.addEventListener('click', () => { labelSheet.style.display = 'none'; pendingBlob = null; });
 
-  retakeBtn.addEventListener('click', () => {
-    reviewSheet.style.display = 'none';
-    pendingBlob = null;
+  saveLocalBtn.addEventListener('click', async () => {
+    const label = labelInput.value.trim();
+    if (!label) { labelInput.focus(); return; }
+    if (!pendingBlob) return;
+    labelStatus.textContent = 'saving…'; labelStatus.className = 'sheet-status pending';
+    try {
+      const sample = {
+        id: uuid(), blob: pendingBlob, label, bbox: null,
+        createdAt: Date.now(), uploaded: false, dirty: true, file: null
+      };
+      await dbPut(sample);
+      rememberLabel(label);
+      await refreshLocalCount();
+      labelStatus.textContent = 'saved to phone ✓'; labelStatus.className = 'sheet-status ok';
+      setTimeout(() => { labelSheet.style.display = 'none'; pendingBlob = null; }, 400);
+    } catch (e) {
+      labelStatus.textContent = 'failed to save — ' + e.message; labelStatus.className = 'sheet-status err';
+    }
   });
 
+  // ============================================================
+  // Library
+  // ============================================================
+  async function refreshLibrary() {
+    const all = (await dbGetAll()).sort((a, b) => b.createdAt - a.createdAt);
+    libTotal.textContent = all.length;
+    libUnboxed.textContent = all.filter(s => !s.bbox).length;
+    libUnsynced.textContent = all.filter(s => s.dirty).length;
+
+    if (!all.length) {
+      libGrid.innerHTML = ''; libEmpty.style.display = 'block';
+    } else {
+      libEmpty.style.display = 'none';
+      libGrid.innerHTML = all.map(s => {
+        const badge = s.dirty ? (s.bbox ? 'boxed' : 'pending') : 'synced';
+        return `<div class="lib-card" data-id="${s.id}">
+          <img src="${URL.createObjectURL(s.blob)}" alt="${s.label}">
+          <span class="lib-badge ${badge}"></span>
+          <span class="lib-label">${s.label}</span>
+        </div>`;
+      }).join('');
+    }
+
+    if (navigator.storage && navigator.storage.estimate) {
+      try {
+        const est = await navigator.storage.estimate();
+        const usedMB = (est.usage / (1024 * 1024)).toFixed(1);
+        const quotaMB = (est.quota / (1024 * 1024)).toFixed(0);
+        storageBar.textContent = `${usedMB} MB used of ~${quotaMB} MB available on this device`;
+      } catch (e) { storageBar.textContent = ''; }
+    }
+
+    syncBtn.disabled = all.filter(s => s.dirty).length === 0;
+  }
+
+  libGrid.addEventListener('click', async (e) => {
+    const card = e.target.closest('.lib-card');
+    if (!card) return;
+    openAnnotate(card.dataset.id);
+  });
+
+  clearSyncedBtn.addEventListener('click', async () => {
+    const all = await dbGetAll();
+    const synced = all.filter(s => s.uploaded && !s.dirty);
+    if (!synced.length) return;
+    if (!confirm(`Remove ${synced.length} already-synced photo(s) from this phone? They'll remain safely on GitHub.`)) return;
+    for (const s of synced) await dbDelete(s.id);
+    refreshLibrary();
+  });
+
+  // ---- Annotate sheet ----
+  let currentSample = null;
+  let drawnBox = null; // {x0,y0,x1,y1} in container px, live while dragging
+  let finalBoxNorm = null; // {x,y,w,h} normalized, committed
+
+  function computeImageRect(container, naturalW, naturalH) {
+    const cw = container.clientWidth, ch = container.clientHeight;
+    const imgAspect = naturalW / naturalH, boxAspect = cw / ch;
+    let width, height, left, top;
+    if (imgAspect > boxAspect) { width = cw; height = cw / imgAspect; left = 0; top = (ch - height) / 2; }
+    else { height = ch; width = ch * imgAspect; top = 0; left = (cw - width) / 2; }
+    return { left, top, width, height };
+  }
+
+  function redrawBoxLayer() {
+    const rect = boxLayer.getBoundingClientRect();
+    boxLayer.width = rect.width; boxLayer.height = rect.height;
+    const bctx = boxLayer.getContext('2d');
+    bctx.clearRect(0, 0, boxLayer.width, boxLayer.height);
+    if (!drawnBox) return;
+    const x = Math.min(drawnBox.x0, drawnBox.x1), y = Math.min(drawnBox.y0, drawnBox.y1);
+    const w = Math.abs(drawnBox.x1 - drawnBox.x0), h = Math.abs(drawnBox.y1 - drawnBox.y0);
+    bctx.strokeStyle = '#ff7a1a'; bctx.lineWidth = 3; bctx.strokeRect(x, y, w, h);
+    bctx.fillStyle = 'rgba(255,122,26,0.12)'; bctx.fillRect(x, y, w, h);
+  }
+
+  function boxFromNorm(norm, imgRect) {
+    return {
+      x0: imgRect.left + norm.x * imgRect.width,
+      y0: imgRect.top + norm.y * imgRect.height,
+      x1: imgRect.left + (norm.x + norm.w) * imgRect.width,
+      y1: imgRect.top + (norm.y + norm.h) * imgRect.height
+    };
+  }
+
+  let dragging = false, dragStart = null;
+  function setupDrag() {
+    const getPoint = (e) => {
+      const rect = boxLayer.getBoundingClientRect();
+      const t = e.touches ? e.touches[0] : e;
+      return { x: t.clientX - rect.left, y: t.clientY - rect.top };
+    };
+    boxLayer.onpointerdown = (e) => {
+      e.preventDefault();
+      dragging = true;
+      dragStart = getPoint(e);
+      drawnBox = { x0: dragStart.x, y0: dragStart.y, x1: dragStart.x, y1: dragStart.y };
+      redrawBoxLayer();
+      boxLayer.setPointerCapture(e.pointerId);
+    };
+    boxLayer.onpointermove = (e) => {
+      if (!dragging) return;
+      const p = getPoint(e);
+      drawnBox.x1 = p.x; drawnBox.y1 = p.y;
+      redrawBoxLayer();
+    };
+    boxLayer.onpointerup = () => {
+      dragging = false;
+      if (drawnBox && Math.abs(drawnBox.x1 - drawnBox.x0) < 12 && Math.abs(drawnBox.y1 - drawnBox.y0) < 12) {
+        drawnBox = null; redrawBoxLayer();
+      }
+    };
+  }
+  setupDrag();
+
+  clearBoxBtn.addEventListener('click', () => { drawnBox = null; redrawBoxLayer(); });
+
+  async function openAnnotate(id) {
+    currentSample = await dbGet(id);
+    if (!currentSample) return;
+    annotateImg.src = URL.createObjectURL(currentSample.blob);
+    annotateLabelInput.value = currentSample.label;
+    annotateStatus.textContent = ''; annotateStatus.className = 'sheet-status';
+    drawnBox = null;
+
+    annotateImg.onload = () => {
+      redrawBoxLayer();
+      if (currentSample.bbox) {
+        const imgRect = computeImageRect(annotatePhotoWrap, annotateImg.naturalWidth, annotateImg.naturalHeight);
+        drawnBox = boxFromNorm(currentSample.bbox, imgRect);
+        redrawBoxLayer();
+      }
+    };
+    annotateSheet.style.display = 'flex';
+  }
+
+  deleteSampleBtn.addEventListener('click', async () => {
+    if (!currentSample) return;
+    if (!confirm('Delete this photo? This cannot be undone.')) return;
+    await dbDelete(currentSample.id);
+    annotateSheet.style.display = 'none';
+    refreshLibrary();
+  });
+
+  saveAnnotationBtn.addEventListener('click', async () => {
+    if (!currentSample) return;
+    const label = annotateLabelInput.value.trim();
+    if (!label) { annotateLabelInput.focus(); return; }
+
+    let bbox = null;
+    if (drawnBox) {
+      const imgRect = computeImageRect(annotatePhotoWrap, annotateImg.naturalWidth, annotateImg.naturalHeight);
+      const x0 = Math.min(drawnBox.x0, drawnBox.x1), y0 = Math.min(drawnBox.y0, drawnBox.y1);
+      const x1 = Math.max(drawnBox.x0, drawnBox.x1), y1 = Math.max(drawnBox.y0, drawnBox.y1);
+      const nx0 = clamp01((x0 - imgRect.left) / imgRect.width);
+      const ny0 = clamp01((y0 - imgRect.top) / imgRect.height);
+      const nx1 = clamp01((x1 - imgRect.left) / imgRect.width);
+      const ny1 = clamp01((y1 - imgRect.top) / imgRect.height);
+      if (nx1 > nx0 && ny1 > ny0) bbox = { x: nx0, y: ny0, w: nx1 - nx0, h: ny1 - ny0 };
+    }
+
+    currentSample.label = label;
+    currentSample.bbox = bbox;
+    currentSample.dirty = true;
+    await dbPut(currentSample);
+    annotateStatus.textContent = 'saved ✓'; annotateStatus.className = 'sheet-status ok';
+    setTimeout(() => { annotateSheet.style.display = 'none'; refreshLibrary(); }, 350);
+  });
+  function clamp01(v) { return Math.max(0, Math.min(1, v)); }
+
+  // ============================================================
+  // GitHub sync
+  // ============================================================
+  function slugify(label) {
+    return label.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'unlabeled';
+  }
+  async function ghRequest(path, options) {
+    const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/${path}`;
+    return fetch(url, {
+      ...options,
+      headers: {
+        'Authorization': `Bearer ${ghConfig.token}`,
+        'Accept': 'application/vnd.github+json',
+        ...(options && options.headers ? options.headers : {})
+      }
+    });
+  }
+  async function fetchLabelsFile() {
+    const res = await ghRequest(`dataset/labels.json?ref=${encodeURIComponent(ghConfig.branch)}`, { method: 'GET' });
+    if (res.status === 404) return { list: [], sha: null };
+    if (!res.ok) throw new Error(`read failed (${res.status})`);
+    const data = await res.json();
+    const decoded = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
+    let list = [];
+    try { list = JSON.parse(decoded); } catch (e) { list = []; }
+    return { list, sha: data.sha };
+  }
+  async function putFile(path, base64Content, message, sha) {
+    const body = { message, content: base64Content, branch: ghConfig.branch };
+    if (sha) body.sha = sha;
+    const res = await ghRequest(path, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+    if (!res.ok) { const t = await res.text().catch(() => ''); throw new Error(`write failed (${res.status}) ${t.slice(0, 120)}`); }
+    return res.json();
+  }
   function blobToBase64(blob) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -521,158 +843,92 @@
     });
   }
 
-  function slugify(label) {
-    return label.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') || 'unlabeled';
-  }
+  syncBtn.addEventListener('click', async () => {
+    loadConfig();
+    if (!ghConfig || !ghConfig.token) { openSettings(); return; }
 
-  async function ghRequest(path, options) {
-    const url = `https://api.github.com/repos/${ghConfig.owner}/${ghConfig.repo}/contents/${path}`;
-    const res = await fetch(url, {
-      ...options,
-      headers: {
-        'Authorization': `Bearer ${ghConfig.token}`,
-        'Accept': 'application/vnd.github+json',
-        ...(options && options.headers ? options.headers : {})
-      }
-    });
-    return res;
-  }
+    const all = await dbGetAll();
+    const dirty = all.filter(s => s.dirty);
+    if (!dirty.length) return;
 
-  async function fetchLabelsFile() {
-    const res = await ghRequest(`dataset/labels.json?ref=${encodeURIComponent(ghConfig.branch)}`, { method: 'GET' });
-    if (res.status === 404) return { list: [], sha: null };
-    if (!res.ok) throw new Error(`GitHub read failed (${res.status})`);
-    const data = await res.json();
-    const decoded = decodeURIComponent(escape(atob(data.content.replace(/\n/g, ''))));
-    let list = [];
-    try { list = JSON.parse(decoded); } catch (e) { list = []; }
-    return { list, sha: data.sha };
-  }
+    syncBtn.disabled = true; clearSyncedBtn.disabled = true;
+    syncLog.style.display = 'block';
+    let ok = 0, fail = 0;
 
-  async function putFile(path, base64Content, message, sha) {
-    const body = { message, content: base64Content, branch: ghConfig.branch };
-    if (sha) body.sha = sha;
-    const res = await ghRequest(path, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body)
-    });
-    if (!res.ok) {
-      const t = await res.text().catch(() => '');
-      throw new Error(`GitHub write failed (${res.status}) ${t.slice(0, 140)}`);
-    }
-    return res.json();
-  }
-
-  saveBtn.addEventListener('click', async () => {
-    const label = labelInput.value.trim();
-    if (!label) { labelInput.focus(); return; }
-    if (!pendingBlob) return;
-
-    saveBtn.disabled = true;
-    retakeBtn.disabled = true;
-    saveStatus.textContent = 'saving to github…';
-    saveStatus.className = 'save-status pending';
-
-    try {
-      const ts = Date.now();
-      const slug = slugify(label);
-      const imgPath = `dataset/images/${slug}_${ts}.jpg`;
-      const base64 = await blobToBase64(pendingBlob);
-
-      await putFile(imgPath, base64, `Add sample: ${label}`, null);
-
-      let attempt = 0;
-      while (attempt < 2) {
-        const { list, sha } = await fetchLabelsFile();
-        list.push({ file: imgPath, label, ts });
-        const jsonB64 = btoa(unescape(encodeURIComponent(JSON.stringify(list, null, 2))));
-        try {
-          await putFile('dataset/labels.json', jsonB64, `Log label: ${label}`, sha);
-          break;
-        } catch (e) {
-          attempt++;
-          if (attempt >= 2) throw e;
+    for (let i = 0; i < dirty.length; i++) {
+      const s = dirty[i];
+      syncLog.innerHTML = `syncing <b>${i + 1}/${dirty.length}</b> — ${s.label}`;
+      try {
+        if (!s.uploaded) {
+          const base64 = await blobToBase64(s.blob);
+          const path = `dataset/images/${slugify(s.label)}_${s.createdAt}.jpg`;
+          await putFile(path, base64, `Add sample: ${s.label}`, null);
+          s.file = path; s.uploaded = true;
         }
+        let attempt = 0;
+        while (attempt < 2) {
+          const { list, sha } = await fetchLabelsFile();
+          const idx = list.findIndex(e => e.file === s.file);
+          const entry = { file: s.file, label: s.label, bbox: s.bbox, ts: s.createdAt };
+          if (idx >= 0) list[idx] = entry; else list.push(entry);
+          const jsonB64 = btoa(unescape(encodeURIComponent(JSON.stringify(list, null, 2))));
+          try { await putFile('dataset/labels.json', jsonB64, `Log: ${s.label}`, sha); break; }
+          catch (e) { attempt++; if (attempt >= 2) throw e; }
+        }
+        s.dirty = false;
+        await dbPut(s);
+        ok++;
+      } catch (e) {
+        fail++;
       }
-
-      sessionSaved++;
-      sessionCountEl.innerHTML = `${sessionSaved} <span style="opacity:.6">saved this session</span>`;
-      rememberLabel(label);
-      saveStatus.textContent = 'saved ✓';
-      saveStatus.className = 'save-status ok';
-      setTimeout(() => { reviewSheet.style.display = 'none'; pendingBlob = null; }, 500);
-    } catch (e) {
-      saveStatus.textContent = 'failed — ' + e.message;
-      saveStatus.className = 'save-status err';
-    } finally {
-      saveBtn.disabled = false;
-      retakeBtn.disabled = false;
     }
+
+    syncLog.innerHTML = `done — <b>${ok}</b> synced${fail ? `, <b>${fail}</b> failed (will retry next sync)` : ''}`;
+    setTimeout(() => { syncLog.style.display = 'none'; }, 3500);
+    syncBtn.disabled = false; clearSyncedBtn.disabled = false;
+    refreshLibrary();
   });
 
+  // ============================================================
+  // Settings
+  // ============================================================
   function openSettings() {
     loadConfig();
     if (ghConfig) {
-      ghOwner.value = ghConfig.owner || '';
-      ghRepo.value = ghConfig.repo || '';
-      ghBranch.value = ghConfig.branch || 'main';
-      ghToken.value = ghConfig.token || '';
-    } else {
-      ghBranch.value = 'main';
-    }
-    settingsMsg.textContent = '';
-    settingsMsg.className = 'settings-msg';
+      ghOwner.value = ghConfig.owner || ''; ghRepo.value = ghConfig.repo || '';
+      ghBranch.value = ghConfig.branch || 'main'; ghToken.value = ghConfig.token || '';
+    } else { ghBranch.value = 'main'; }
+    settingsMsg.textContent = ''; settingsMsg.className = 'settings-msg';
     settingsSheet.style.display = 'block';
   }
   gearBtn.addEventListener('click', openSettings);
   settingsCancel.addEventListener('click', () => { settingsSheet.style.display = 'none'; });
 
   settingsSave.addEventListener('click', async () => {
-    const cfg = {
-      owner: ghOwner.value.trim(),
-      repo: ghRepo.value.trim(),
-      branch: (ghBranch.value.trim() || 'main'),
-      token: ghToken.value.trim()
-    };
+    const cfg = { owner: ghOwner.value.trim(), repo: ghRepo.value.trim(), branch: (ghBranch.value.trim() || 'main'), token: ghToken.value.trim() };
     if (!cfg.owner || !cfg.repo || !cfg.token) {
-      settingsMsg.textContent = 'Fill in username, repo, and token.';
-      settingsMsg.className = 'settings-msg err';
-      return;
+      settingsMsg.textContent = 'Fill in username, repo, and token.'; settingsMsg.className = 'settings-msg err'; return;
     }
     settingsSave.disabled = true;
-    settingsMsg.textContent = 'checking connection…';
-    settingsMsg.className = 'settings-msg';
-
-    const prevConfig = ghConfig;
-    ghConfig = cfg;
+    settingsMsg.textContent = 'checking connection…'; settingsMsg.className = 'settings-msg';
+    const prev = ghConfig; ghConfig = cfg;
     try {
       const res = await ghRequest('', { method: 'GET' });
-      if (res.status === 401 || res.status === 403) {
-        throw new Error('Token rejected — check it has Contents: Read & write on this repo.');
-      }
-      if (res.status === 404) {
-        throw new Error('Repo not found — check the username and repo name.');
-      }
+      if (res.status === 401 || res.status === 403) throw new Error('Token rejected — check it has Contents: Read & write on this repo.');
+      if (res.status === 404) throw new Error('Repo not found — check the username and repo name.');
       saveConfig(cfg);
-      settingsMsg.textContent = 'connected ✓';
-      settingsMsg.className = 'settings-msg ok';
-      setTimeout(() => { settingsSheet.style.display = 'none'; setMode('collect'); }, 500);
+      settingsMsg.textContent = 'connected ✓'; settingsMsg.className = 'settings-msg ok';
+      setTimeout(() => { settingsSheet.style.display = 'none'; }, 500);
     } catch (e) {
-      ghConfig = prevConfig;
+      ghConfig = prev;
       settingsMsg.textContent = e.message || 'Could not connect. Check details and try again.';
       settingsMsg.className = 'settings-msg err';
-    } finally {
-      settingsSave.disabled = false;
-    }
+    } finally { settingsSave.disabled = false; }
   });
 
   startBtn.addEventListener('click', start);
-
   if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js').catch(() => {});
-    });
+    window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').catch(() => {}); });
   }
 })();
 </script>
